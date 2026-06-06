@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker - Analytics</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <header class="glass">
+        <div class="logo">BT</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="analytics.html" class="active">Expense Info</a></li>
+                <li><a href="budget.html">Budget Estimate</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Expense Insights</h1>
+            <input type="month" id="month-selector" class="glass" style="width: auto;">
+        </div>
+
+        <div class="grid-2">
+            <!-- Pie Chart for Sector Breakdown -->
+            <section class="card glass">
+                <h2>Sector Breakdown</h2>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="sectorChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Bar Chart for Monthly Comparison -->
+            <section class="card glass">
+                <h2>Monthly Comparison</h2>
+                <div style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- AI Insights Cards -->
+        <section class="card glass" style="margin-top: 2rem;">
+            <h2>Key Insights</h2>
+            <div class="grid-3" id="insights-container">
+                <!-- Insights rendered by JS -->
+            </div>
+        </section>
+    </main>
+
+    <script src="js/store.js"></script>
+    <script src="js/analytics.js"></script>
+</body>
+</html>
