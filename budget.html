@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Tracker - Estimate</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <header class="glass">
+        <div class="logo">BT</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="analytics.html">Expense Info</a></li>
+                <li><a href="budget.html" class="active">Budget Estimate</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <h1>Budget Estimator</h1>
+            <input type="month" id="month-selector" class="glass" style="width: auto;">
+        </div>
+
+        <div class="grid-2">
+            <!-- Budget Setting Form -->
+            <section class="card glass">
+                <h2>Set Budgets</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; font-size: 0.9rem;">
+                    Set an overall limit, or allocate specific amounts per category.
+                </p>
+                
+                <div class="form-group">
+                    <label for="overall-budget">Overall Monthly Budget</label>
+                    <input type="number" id="overall-budget" placeholder="0.00" min="0">
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid var(--glass-border); margin: 1.5rem 0;">
+
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Category Budgets (Optional)</h3>
+                <div id="category-budgets-container">
+                    <!-- Inputs rendered by JS -->
+                </div>
+
+                <button class="btn" id="btn-save-budget" style="width: 100%; margin-top: 1rem;">Save Budgets</button>
+            </section>
+
+            <!-- Budget Status -->
+            <section class="card glass">
+                <h2>Budget Status</h2>
+                
+                <div id="overall-status" style="margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 1px solid var(--glass-border);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>Overall Budget</span>
+                        <span id="overall-text">0 / 0</span>
+                    </div>
+                    <div style="width: 100%; height: 12px; background: rgba(255,255,255,0.1); border-radius: 6px; overflow: hidden;">
+                        <div id="overall-progress" style="height: 100%; width: 0%; background: var(--success); transition: width 0.5s;"></div>
+                    </div>
+                    <p id="overall-msg" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);"></p>
+                </div>
+
+                <h3 style="font-size: 1.1rem; margin-bottom: 1rem;">Category Status</h3>
+                <div id="category-status-container">
+                    <!-- Progress bars rendered by JS -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="js/store.js"></script>
+    <script src="js/budget.js"></script>
+</body>
+</html>
