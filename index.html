@@ -41,13 +41,15 @@
                     <div class="tags-container" id="tags-container">
                         <!-- Tags rendered by JS -->
                     </div>
-                    <div class="tag-input-row">
-                        <input type="text" id="new-tag-name" placeholder="Custom Tag Name">
-                        <div class="tag-actions">
-                            <input type="text" id="new-tag-icon" placeholder="Icon" style="max-width: 80px; text-align: center;">
-                            <button class="btn" id="btn-add-tag" title="Add New Tag">➕ Add</button>
-                            <button class="btn btn-warning" id="btn-update-tag" title="Update Tag" style="display: none;">✎ Update</button>
-                            <button class="btn btn-danger" id="btn-delete-tag" title="Delete Tag" style="display: none;">🗑 Delete</button>
+                    <div class="tag-input-wrapper">
+                        <div class="tag-inputs">
+                            <input type="text" id="new-tag-name" placeholder="Custom Tag Name">
+                            <input type="text" id="new-tag-icon" placeholder="Icon" style="width: 80px; text-align: center;">
+                        </div>
+                        <div class="tag-buttons">
+                            <button class="btn" id="btn-add-tag">➕ Add</button>
+                            <button class="btn btn-warning" id="btn-update-tag" style="display: none;">✎ Update</button>
+                            <button class="btn btn-danger" id="btn-delete-tag" style="display: none;">🗑 Delete</button>
                         </div>
                     </div>
                 </div>

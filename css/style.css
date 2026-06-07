@@ -171,15 +171,20 @@ input:focus, select:focus {
 }
 
 /* Tags Section */
-.tag-input-row {
+.tag-input-wrapper {
   display: flex;
   gap: 0.5rem;
   margin-top: 0.5rem;
 }
-.tag-input-row > input {
+.tag-inputs {
+  display: flex;
+  gap: 0.5rem;
   flex: 1;
 }
-.tag-actions {
+.tag-inputs > input:first-child {
+  flex: 1;
+}
+.tag-buttons {
   display: flex;
   gap: 0.5rem;
 }
@@ -304,13 +309,10 @@ input:focus, select:focus {
     font-size: 0.9rem;
   }
 
-  .tag-input-row {
+  .tag-input-wrapper {
     flex-direction: column;
   }
-  .tag-actions {
-    width: 100%;
-  }
-  .tag-actions button {
+  .tag-buttons button {
     flex: 1;
     padding: 0.8rem 0.5rem;
     font-size: 0.9rem;
