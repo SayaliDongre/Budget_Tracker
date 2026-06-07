@@ -171,6 +171,19 @@ input:focus, select:focus {
 }
 
 /* Tags Section */
+.tag-input-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+.tag-input-row > input {
+  flex: 1;
+}
+.tag-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .tags-container {
   display: flex;
   flex-wrap: wrap;
@@ -288,6 +301,18 @@ input:focus, select:focus {
   
   nav ul {
     gap: 1rem;
+    font-size: 0.9rem;
+  }
+
+  .tag-input-row {
+    flex-direction: column;
+  }
+  .tag-actions {
+    width: 100%;
+  }
+  .tag-actions button {
+    flex: 1;
+    padding: 0.8rem 0.5rem;
     font-size: 0.9rem;
   }
 }

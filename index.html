@@ -41,13 +41,13 @@
                     <div class="tags-container" id="tags-container">
                         <!-- Tags rendered by JS -->
                     </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
-                        <input type="text" id="new-tag-name" placeholder="Custom Tag Name" style="flex: 1; min-width: 140px;">
-                        <div style="display: flex; gap: 0.5rem; flex-wrap: nowrap;">
-                            <input type="text" id="new-tag-icon" placeholder="Icon" style="width: 70px; text-align: center;">
-                            <button class="btn" id="btn-add-tag" title="Add New Tag" style="padding: 0 1rem; display: flex; align-items: center; justify-content: center;">➕</button>
-                            <button class="btn btn-warning" id="btn-update-tag" title="Update Tag" style="display: none; padding: 0 1rem; align-items: center; justify-content: center;">✎</button>
-                            <button class="btn btn-danger" id="btn-delete-tag" title="Delete Tag" style="display: none; padding: 0 1rem; align-items: center; justify-content: center;">🗑</button>
+                    <div class="tag-input-row">
+                        <input type="text" id="new-tag-name" placeholder="Custom Tag Name">
+                        <div class="tag-actions">
+                            <input type="text" id="new-tag-icon" placeholder="Icon" style="max-width: 80px; text-align: center;">
+                            <button class="btn" id="btn-add-tag" title="Add New Tag">➕ Add</button>
+                            <button class="btn btn-warning" id="btn-update-tag" title="Update Tag" style="display: none;">✎ Update</button>
+                            <button class="btn btn-danger" id="btn-delete-tag" title="Delete Tag" style="display: none;">🗑 Delete</button>
                         </div>
                     </div>
                 </div>
