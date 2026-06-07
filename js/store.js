@@ -48,6 +48,21 @@ class Store {
         return tag;
     }
 
+    static updateTag(id, updatedTag) {
+        let tags = Store.getTags();
+        const index = tags.findIndex(t => t.id === id);
+        if (index !== -1) {
+            tags[index] = { ...tags[index], ...updatedTag };
+            localStorage.setItem(STORE_KEYS.TAGS, JSON.stringify(tags));
+        }
+    }
+
+    static deleteTag(id) {
+        let tags = Store.getTags();
+        tags = tags.filter(t => t.id !== id);
+        localStorage.setItem(STORE_KEYS.TAGS, JSON.stringify(tags));
+    }
+
     static getBudgets() {
         const budgets = localStorage.getItem(STORE_KEYS.BUDGETS);
         // budgets is an object keyed by "YYYY-MM"
@@ -58,6 +73,15 @@ class Store {
         const budgets = Store.getBudgets();
         budgets[monthKey] = budgetData; // { overall: number, tags: { tagId: number } }
         localStorage.setItem(STORE_KEYS.BUDGETS, JSON.stringify(budgets));
+    }
+
+    static getLastBackupTime() {
+        const time = localStorage.getItem('budget_tracker_last_backup');
+        return time ? parseInt(time) : 0;
+    }
+
+    static updateLastBackupTime() {
+        localStorage.setItem('budget_tracker_last_backup', Date.now().toString());
     }
 
     static getExpensesByDate(dateString) {

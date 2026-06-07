@@ -163,6 +163,13 @@ input:focus, select:focus {
   background: #dc2626;
 }
 
+.btn-warning {
+  background: var(--warning);
+}
+.btn-warning:hover {
+  background: #d97706;
+}
+
 /* Tags Section */
 .tags-container {
   display: flex;

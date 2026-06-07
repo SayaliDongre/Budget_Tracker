@@ -6,6 +6,8 @@
     <title>Budget Tracker - Analytics</title>
     <link rel="stylesheet" href="css/style.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
 
@@ -25,6 +27,16 @@
             <h1>Expense Insights</h1>
             <input type="month" id="month-selector" class="glass" style="width: auto;">
         </div>
+
+        <!-- Data Management Section -->
+        <section class="card glass" style="margin-bottom: 2rem;">
+            <h2 style="margin-bottom: 1rem;">Export Data</h2>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                <button class="btn" id="btn-export-json">Backup (JSON)</button>
+                <button class="btn" id="btn-export-csv" style="background: var(--success);">Export to Excel (CSV)</button>
+                <button class="btn" id="btn-export-pdf" style="background: var(--danger);">Export Report (PDF)</button>
+            </div>
+        </section>
 
         <div class="grid-2">
             <!-- Pie Chart for Sector Breakdown -->

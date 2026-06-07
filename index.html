@@ -8,6 +8,12 @@
 </head>
 <body>
 
+    <div id="backup-banner" style="display: none; background: var(--warning); color: #fff; padding: 1rem; text-align: center; position: sticky; top: 0; z-index: 101; flex-wrap: wrap; gap: 1rem; justify-content: center; align-items: center;">
+        <span>It's been over 3 days since your last backup! Keep your data safe.</span>
+        <button id="btn-banner-backup" class="btn" style="padding: 0.5rem 1rem; background: rgba(0,0,0,0.2);">Save Backup Now</button>
+        <button id="btn-banner-dismiss" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 1.5rem; margin-left: 1rem;">&times;</button>
+    </div>
+
     <header class="glass">
         <div class="logo">BT</div>
         <nav>
@@ -38,7 +44,9 @@
                     <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
                         <input type="text" id="new-tag-name" placeholder="Custom Tag" style="flex: 1;">
                         <input type="text" id="new-tag-icon" placeholder="Icon (e.g. 🍕)" style="width: 100px;">
-                        <button class="btn" id="btn-add-tag">+</button>
+                        <button class="btn" id="btn-add-tag" title="Add New Tag">+</button>
+                        <button class="btn btn-warning" id="btn-update-tag" title="Update Tag" style="display: none;">✎</button>
+                        <button class="btn btn-danger" id="btn-delete-tag" title="Delete Tag" style="display: none;">🗑</button>
                     </div>
                 </div>
 

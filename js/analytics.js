@@ -182,4 +182,73 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initial render
     renderCharts();
+
+    // Export Logic
+    document.getElementById('btn-export-json').addEventListener('click', () => {
+        const data = {
+            expenses: Store.getExpenses(),
+            tags: Store.getTags(),
+            budgets: Store.getBudgets()
+        };
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `BT_Backup_${new Date().toISOString().split('T')[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        Store.updateLastBackupTime(); // Update tracker
+    });
+
+    document.getElementById('btn-export-csv').addEventListener('click', () => {
+        const expenses = Store.getExpenses();
+        const tags = Store.getTags();
+        const tagMap = {};
+        tags.forEach(t => tagMap[t.id] = t);
+
+        let csvContent = "Date,Category,Description,Amount\n";
+        expenses.forEach(exp => {
+            const category = tagMap[exp.tagId] ? tagMap[exp.tagId].name : 'Unknown';
+            const desc = (exp.desc || '').replace(/,/g, ' '); // prevent csv comma issues
+            csvContent += `${exp.date},${category},${desc},${exp.amount}\n`;
+        });
+
+        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `BT_Expenses_${new Date().toISOString().split('T')[0]}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('btn-export-pdf').addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(20);
+        doc.text("Expense Report", 14, 22);
+        doc.setFontSize(11);
+        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 30);
+
+        const expenses = Store.getExpenses();
+        const tags = Store.getTags();
+        const tagMap = {};
+        tags.forEach(t => tagMap[t.id] = t);
+
+        const tableData = expenses.map(exp => {
+            const category = tagMap[exp.tagId] ? tagMap[exp.tagId].name : 'Unknown';
+            return [exp.date, category, exp.desc || '-', `Rs. ${parseFloat(exp.amount).toFixed(2)}`];
+        });
+
+        doc.autoTable({
+            startY: 40,
+            head: [['Date', 'Category', 'Description', 'Amount']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: { fillColor: [99, 102, 241] } // var(--accent-color)
+        });
+
+        doc.save(`BT_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+    });
 });
