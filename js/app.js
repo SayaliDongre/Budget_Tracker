@@ -42,17 +42,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     selectedTagId = null;
                     newTagName.value = '';
                     newTagIcon.value = '';
-                    btnAddTag.style.display = 'block';
-                    btnUpdateTag.style.display = 'none';
-                    btnDeleteTag.style.display = 'none';
+                    btnAddTag.classList.remove('hidden');
+                    btnUpdateTag.classList.add('hidden');
+                    btnDeleteTag.classList.add('hidden');
                 } else {
                     // Select tag
                     selectedTagId = tag.id;
                     newTagName.value = tag.name;
                     newTagIcon.value = tag.icon;
-                    btnAddTag.style.display = 'none';
-                    btnUpdateTag.style.display = 'block';
-                    btnDeleteTag.style.display = 'block';
+                    btnAddTag.classList.add('hidden');
+                    btnUpdateTag.classList.remove('hidden');
+                    btnDeleteTag.classList.remove('hidden');
                 }
                 renderTags(); // re-render to update selected visual
             });
@@ -141,9 +141,9 @@ document.addEventListener('DOMContentLoaded', () => {
             selectedTagId = null;
             newTagName.value = '';
             newTagIcon.value = '';
-            btnAddTag.style.display = 'block';
-            btnUpdateTag.style.display = 'none';
-            btnDeleteTag.style.display = 'none';
+            btnAddTag.classList.remove('hidden');
+            btnUpdateTag.classList.add('hidden');
+            btnDeleteTag.classList.add('hidden');
             renderTags();
             renderExpenses(); // update UI in case tag name changed
         }
@@ -156,9 +156,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedTagId = null;
                 newTagName.value = '';
                 newTagIcon.value = '';
-                btnAddTag.style.display = 'block';
-                btnUpdateTag.style.display = 'none';
-                btnDeleteTag.style.display = 'none';
+                btnAddTag.classList.remove('hidden');
+                btnUpdateTag.classList.add('hidden');
+                btnDeleteTag.classList.add('hidden');
                 renderTags();
                 renderExpenses();
             }

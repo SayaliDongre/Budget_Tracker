@@ -25,6 +25,10 @@
   font-family: 'Outfit', sans-serif;
 }
 
+.hidden {
+  display: none !important;
+}
+
 body {
   background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
   background-attachment: fixed;
