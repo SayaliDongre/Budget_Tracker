@@ -24,9 +24,22 @@ class Store {
     static saveExpense(expense) {
         const expenses = Store.getExpenses();
         // Give it a unique ID and current timestamp if not provided
-        expense.id = expense.id || Date.now().toString();
+        expense.id = expense.id || ('exp_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6));
         expenses.push(expense);
         localStorage.setItem(STORE_KEYS.EXPENSES, JSON.stringify(expenses));
+    }
+
+    static updateExpense(id, updatedData) {
+        let expenses = Store.getExpenses();
+        const index = expenses.findIndex(exp => exp.id === id);
+        if (index !== -1) {
+            expenses[index] = { ...expenses[index], ...updatedData };
+            localStorage.setItem(STORE_KEYS.EXPENSES, JSON.stringify(expenses));
+        }
+    }
+
+    static getExpenseById(id) {
+        return Store.getExpenses().find(exp => exp.id === id) || null;
     }
 
     static deleteExpense(id) {
@@ -42,7 +55,7 @@ class Store {
 
     static addTag(tag) {
         const tags = Store.getTags();
-        tag.id = 't' + Date.now();
+        tag.id = tag.id || ('t_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6));
         tags.push(tag);
         localStorage.setItem(STORE_KEYS.TAGS, JSON.stringify(tags));
         return tag;
@@ -134,27 +147,85 @@ class Store {
         };
     }
 
+    static getExportData() {
+        const expenses = Store.getExpenses();
+        const tags = Store.getTags();
+        const tagMap = {};
+        tags.forEach(t => tagMap[t.id] = t);
+
+        const enrichedExpenses = expenses.map(exp => ({
+            ...exp,
+            tagName: tagMap[exp.tagId] ? tagMap[exp.tagId].name : 'Unknown',
+            tagIcon: tagMap[exp.tagId] ? tagMap[exp.tagId].icon : '🏷️'
+        }));
+
+        return {
+            expenses: enrichedExpenses,
+            tags: tags,
+            budgets: Store.getBudgets(),
+            exportedAt: new Date().toISOString()
+        };
+    }
+
     static mergeImportData(importedData, strategy = 'keep-both', overlapInfo = null) {
-        const localTags = Store.getTags();
+        let localTags = Store.getTags();
         const importedTags = importedData.tags || [];
 
         // Map imported tag IDs to existing or newly created local tag IDs
         const tagMap = {};
         importedTags.forEach(iTag => {
-            const existingTag = localTags.find(lTag => lTag.id === iTag.id || lTag.name.toLowerCase() === iTag.name.toLowerCase());
+            if (!iTag || !iTag.name) return;
+            const cleanName = iTag.name.trim().toLowerCase();
+            let existingTag = localTags.find(lTag => lTag.id === iTag.id || lTag.name.trim().toLowerCase() === cleanName);
             if (existingTag) {
                 tagMap[iTag.id] = existingTag.id;
             } else {
-                const newTag = Store.addTag({ name: iTag.name, icon: iTag.icon || '🏷️' });
+                const newTag = {
+                    id: 't_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                    name: iTag.name.trim(),
+                    icon: iTag.icon || '🏷️'
+                };
+                localTags.push(newTag);
                 tagMap[iTag.id] = newTag.id;
             }
         });
 
-        // Update tag IDs in imported expenses
-        const normalizedImportedExpenses = (importedData.expenses || []).map(exp => ({
-            ...exp,
-            tagId: tagMap[exp.tagId] || exp.tagId || 't1'
-        }));
+        // Save updated local tags list
+        localStorage.setItem(STORE_KEYS.TAGS, JSON.stringify(localTags));
+
+        // Update tag IDs in imported expenses with self-contained fallback
+        const normalizedImportedExpenses = (importedData.expenses || []).map(exp => {
+            let mappedTagId = tagMap[exp.tagId];
+            if (!mappedTagId) {
+                // Try matching by exp.tagName if present
+                const expTagName = exp.tagName || exp.tag;
+                if (expTagName) {
+                    const cleanExpTagName = expTagName.trim().toLowerCase();
+                    let existingTag = localTags.find(t => t.name.trim().toLowerCase() === cleanExpTagName);
+                    if (!existingTag) {
+                        existingTag = {
+                            id: 't_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+                            name: expTagName.trim(),
+                            icon: exp.tagIcon || '🏷️'
+                        };
+                        localTags.push(existingTag);
+                        localStorage.setItem(STORE_KEYS.TAGS, JSON.stringify(localTags));
+                    }
+                    mappedTagId = existingTag.id;
+                } else {
+                    const exists = localTags.some(t => t.id === exp.tagId);
+                    mappedTagId = exists ? exp.tagId : 't1';
+                }
+            }
+
+            const currentTag = localTags.find(t => t.id === mappedTagId);
+            return {
+                ...exp,
+                tagId: mappedTagId,
+                tagName: currentTag ? currentTag.name : (exp.tagName || 'Unknown'),
+                tagIcon: currentTag ? currentTag.icon : (exp.tagIcon || '🏷️')
+            };
+        });
 
         let localExpenses = Store.getExpenses();
 

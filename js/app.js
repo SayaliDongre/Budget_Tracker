@@ -78,6 +78,27 @@ document.addEventListener('DOMContentLoaded', () => {
             listTitle.textContent = `Expenses for ${monthStr}`;
         }
 
+    let editingExpenseId = null;
+
+    function renderExpenses() {
+        const dateVal = dateSelector.value;
+        const mode = viewMode.value;
+        let expenses = [];
+
+        if (mode === 'day') {
+            expenses = Store.getExpensesByDate(dateVal);
+        } else {
+            const monthVal = dateVal.substring(0, 7);
+            expenses = Store.getExpensesByMonth(monthVal);
+        }
+
+        const tags = Store.getTags();
+        const tagMap = {};
+        tags.forEach(t => tagMap[t.id] = t);
+
+        expenseList.innerHTML = '';
+        let total = 0;
+
         if (expenses.length === 0) {
             expenseList.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 2rem 0;">No expenses found.</p>';
             totalAmountElem.textContent = '0.00';
@@ -86,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         expenses.forEach(exp => {
             total += parseFloat(exp.amount);
-            const tag = tagMap[exp.tagId] || { name: 'Unknown', icon: '❓' };
+            const tag = tagMap[exp.tagId] || { name: exp.tagName || 'Unknown', icon: exp.tagIcon || '❓' };
             
             const expEl = document.createElement('div');
             expEl.className = 'expense-item glass';
@@ -100,7 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div style="display: flex; align-items: center; gap: 1rem;">
                     <div class="expense-amount">${parseFloat(exp.amount).toFixed(2)}</div>
                     <div class="expense-actions" style="margin-top: 0;">
-                        <button class="btn-icon delete" data-id="${exp.id}" title="Delete">🗑️</button>
+                        <button class="btn-icon edit" data-id="${exp.id}" title="Edit Expense">✎</button>
+                        <button class="btn-icon delete" data-id="${exp.id}" title="Delete Expense">🗑️</button>
                     </div>
                 </div>
             `;
@@ -109,14 +131,47 @@ document.addEventListener('DOMContentLoaded', () => {
 
         totalAmountElem.textContent = total.toFixed(2);
 
+        // Edit listeners
+        document.querySelectorAll('.btn-icon.edit').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = e.currentTarget.getAttribute('data-id');
+                const exp = Store.getExpenseById(id);
+                if (!exp) return;
+
+                editingExpenseId = id;
+                expenseAmount.value = exp.amount;
+                expenseDesc.value = exp.desc || '';
+                if (exp.date) dateSelector.value = exp.date;
+
+                selectedTagId = exp.tagId;
+                renderTags();
+
+                btnAddExpense.textContent = 'Save Changes ✎';
+                btnAddExpense.style.background = 'var(--warning)';
+                btnAddExpense.style.color = '#000';
+            });
+        });
+
         // Add delete listeners
         document.querySelectorAll('.btn-icon.delete').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const id = e.currentTarget.getAttribute('data-id');
                 Store.deleteExpense(id);
+                if (editingExpenseId === id) {
+                    resetExpenseForm();
+                }
                 renderExpenses();
             });
         });
+    }
+
+    function resetExpenseForm() {
+        editingExpenseId = null;
+        expenseAmount.value = '';
+        expenseDesc.value = '';
+        btnAddExpense.textContent = 'Add Expense';
+        btnAddExpense.style.background = 'var(--accent-color)';
+        btnAddExpense.style.color = '#fff';
     }
 
     // Event Listeners
@@ -175,17 +230,25 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        Store.saveExpense({
-            tagId: selectedTagId,
-            desc: desc,
-            amount: parseFloat(amount),
-            date: date
-        });
+        if (editingExpenseId) {
+            Store.updateExpense(editingExpenseId, {
+                tagId: selectedTagId,
+                desc: desc,
+                amount: parseFloat(amount),
+                date: date
+            });
+            resetExpenseForm();
+        } else {
+            Store.saveExpense({
+                tagId: selectedTagId,
+                desc: desc,
+                amount: parseFloat(amount),
+                date: date
+            });
+            expenseAmount.value = '';
+            expenseDesc.value = '';
+        }
 
-        // Reset form
-        expenseAmount.value = '';
-        expenseDesc.value = '';
-        
         renderExpenses();
     });
 
@@ -211,11 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     btnBannerBackup.addEventListener('click', () => {
-        const data = {
-            expenses: Store.getExpenses(),
-            tags: Store.getTags(),
-            budgets: Store.getBudgets()
-        };
+        const data = Store.getExportData();
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');

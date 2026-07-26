@@ -185,11 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Export Logic
     document.getElementById('btn-export-json').addEventListener('click', () => {
-        const data = {
-            expenses: Store.getExpenses(),
-            tags: Store.getTags(),
-            budgets: Store.getBudgets()
-        };
+        const data = Store.getExportData();
         const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
