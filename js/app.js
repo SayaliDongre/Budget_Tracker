@@ -61,23 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function renderExpenses() {
-        expenseList.innerHTML = '';
-        let expenses = [];
-        let total = 0;
-        const tags = Store.getTags();
-        const tagMap = {};
-        tags.forEach(t => tagMap[t.id] = t);
-
-        if (viewMode.value === 'day') {
-            expenses = Store.getExpensesByDate(dateSelector.value);
-            listTitle.textContent = `Expenses for ${dateSelector.value}`;
-        } else {
-            const monthStr = dateSelector.value.substring(0, 7); // YYYY-MM
-            expenses = Store.getExpensesByMonth(monthStr);
-            listTitle.textContent = `Expenses for ${monthStr}`;
-        }
-
     let editingExpenseId = null;
 
     function renderExpenses() {
@@ -87,9 +70,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (mode === 'day') {
             expenses = Store.getExpensesByDate(dateVal);
+            listTitle.textContent = `Expenses for ${dateVal}`;
         } else {
             const monthVal = dateVal.substring(0, 7);
             expenses = Store.getExpensesByMonth(monthVal);
+            listTitle.textContent = `Expenses for ${monthVal}`;
         }
 
         const tags = Store.getTags();
