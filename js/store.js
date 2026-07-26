@@ -49,8 +49,47 @@ class Store {
     }
 
     static getTags() {
-        const tags = localStorage.getItem(STORE_KEYS.TAGS);
-        return tags ? JSON.parse(tags) : [...DEFAULT_TAGS];
+        const tagsRaw = localStorage.getItem(STORE_KEYS.TAGS);
+        let tags = tagsRaw ? JSON.parse(tagsRaw) : [...DEFAULT_TAGS];
+
+        // Deduplicate tag IDs if any corrupted tags exist
+        const seenIds = new Set();
+        let updated = false;
+        tags = tags.map(t => {
+            if (!t.id || seenIds.has(t.id)) {
+                updated = true;
+                return { ...t, id: 't_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6) };
+            }
+            seenIds.add(t.id);
+            return t;
+        });
+
+        if (updated) {
+            localStorage.setItem(STORE_KEYS.TAGS, JSON.stringify(tags));
+        }
+
+        return tags;
+    }
+
+    static repairCorruptedTags() {
+        const localTags = Store.getTags();
+        let expenses = Store.getExpenses();
+        let modified = false;
+
+        expenses = expenses.map(exp => {
+            if (exp.tagName) {
+                const matchedTag = localTags.find(t => t.name.trim().toLowerCase() === exp.tagName.trim().toLowerCase());
+                if (matchedTag && matchedTag.id !== exp.tagId) {
+                    modified = true;
+                    return { ...exp, tagId: matchedTag.id, tagIcon: matchedTag.icon };
+                }
+            }
+            return exp;
+        });
+
+        if (modified) {
+            localStorage.setItem(STORE_KEYS.EXPENSES, JSON.stringify(expenses));
+        }
     }
 
     static addTag(tag) {
@@ -171,12 +210,16 @@ class Store {
         let localTags = Store.getTags();
         const importedTags = importedData.tags || [];
 
-        // Map imported tag IDs to existing or newly created local tag IDs
+        // Build tag map prioritizing Name Match
         const tagMap = {};
         importedTags.forEach(iTag => {
             if (!iTag || !iTag.name) return;
             const cleanName = iTag.name.trim().toLowerCase();
-            let existingTag = localTags.find(lTag => lTag.id === iTag.id || lTag.name.trim().toLowerCase() === cleanName);
+            // Match BY NAME FIRST to prevent duplicate ID collisions from old imports
+            let existingTag = localTags.find(lTag => lTag.name.trim().toLowerCase() === cleanName);
+            if (!existingTag) {
+                existingTag = localTags.find(lTag => lTag.id === iTag.id);
+            }
             if (existingTag) {
                 tagMap[iTag.id] = existingTag.id;
             } else {
@@ -193,37 +236,31 @@ class Store {
         // Save updated local tags list
         localStorage.setItem(STORE_KEYS.TAGS, JSON.stringify(localTags));
 
-        // Update tag IDs in imported expenses with self-contained fallback
+        // Update tag IDs in imported expenses by inspecting JSON tag names
         const normalizedImportedExpenses = (importedData.expenses || []).map(exp => {
-            let mappedTagId = tagMap[exp.tagId];
-            if (!mappedTagId) {
-                // Try matching by exp.tagName if present
-                const expTagName = exp.tagName || exp.tag;
-                if (expTagName) {
-                    const cleanExpTagName = expTagName.trim().toLowerCase();
-                    let existingTag = localTags.find(t => t.name.trim().toLowerCase() === cleanExpTagName);
-                    if (!existingTag) {
-                        existingTag = {
-                            id: 't_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
-                            name: expTagName.trim(),
-                            icon: exp.tagIcon || '🏷️'
-                        };
-                        localTags.push(existingTag);
-                        localStorage.setItem(STORE_KEYS.TAGS, JSON.stringify(localTags));
-                    }
-                    mappedTagId = existingTag.id;
-                } else {
-                    const exists = localTags.some(t => t.id === exp.tagId);
-                    mappedTagId = exists ? exp.tagId : 't1';
+            const importedTagObj = importedTags.find(t => t && t.id === exp.tagId);
+            const targetName = (importedTagObj ? importedTagObj.name : null) || exp.tagName || exp.tag;
+
+            let mappedTagId = null;
+
+            if (targetName) {
+                const cleanTargetName = targetName.trim().toLowerCase();
+                const matchedTag = localTags.find(t => t.name.trim().toLowerCase() === cleanTargetName);
+                if (matchedTag) {
+                    mappedTagId = matchedTag.id;
                 }
+            }
+
+            if (!mappedTagId) {
+                mappedTagId = tagMap[exp.tagId] || exp.tagId || 't1';
             }
 
             const currentTag = localTags.find(t => t.id === mappedTagId);
             return {
                 ...exp,
                 tagId: mappedTagId,
-                tagName: currentTag ? currentTag.name : (exp.tagName || 'Unknown'),
-                tagIcon: currentTag ? currentTag.icon : (exp.tagIcon || '🏷️')
+                tagName: currentTag ? currentTag.name : (targetName || 'Unknown'),
+                tagIcon: currentTag ? currentTag.icon : (importedTagObj ? importedTagObj.icon : '🏷️')
             };
         });
 

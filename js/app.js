@@ -240,7 +240,8 @@ document.addEventListener('DOMContentLoaded', () => {
     dateSelector.addEventListener('change', renderExpenses);
     viewMode.addEventListener('change', renderExpenses);
 
-    // Initial render
+    // Initial render & repair
+    Store.repairCorruptedTags();
     renderTags();
     renderExpenses();
 

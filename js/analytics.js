@@ -180,7 +180,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     monthSelector.addEventListener('change', renderCharts);
 
-    // Initial render
+    // Initial render & repair
+    Store.repairCorruptedTags();
     renderCharts();
 
     // Export Logic
