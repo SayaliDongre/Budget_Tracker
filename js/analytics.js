@@ -251,4 +251,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         doc.save(`BT_Report_${new Date().toISOString().split('T')[0]}.pdf`);
     });
+
+    // Import Logic
+    Store.setupImportHandler({
+        triggerBtn: document.getElementById('btn-import-json'),
+        fileInput: document.getElementById('json-file-input'),
+        modal: document.getElementById('import-modal'),
+        descEl: document.getElementById('modal-overlap-desc'),
+        btnBoth: document.getElementById('btn-merge-both'),
+        btnJson: document.getElementById('btn-merge-json'),
+        btnLocal: document.getElementById('btn-merge-local'),
+        btnCancel: document.getElementById('btn-cancel-import'),
+        onComplete: () => {
+            renderCharts();
+        }
+    });
 });

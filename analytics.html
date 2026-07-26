@@ -30,13 +30,40 @@
 
         <!-- Data Management Section -->
         <section class="card glass" style="margin-bottom: 2rem;">
-            <h2 style="margin-bottom: 1rem;">Export Data</h2>
+            <h2 style="margin-bottom: 1rem;">Data Management</h2>
             <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
                 <button class="btn" id="btn-export-json">Backup (JSON)</button>
+                <button class="btn" id="btn-import-json" style="background: #3b82f6;">Import (JSON)</button>
                 <button class="btn" id="btn-export-csv" style="background: var(--success);">Export to Excel (CSV)</button>
                 <button class="btn" id="btn-export-pdf" style="background: var(--danger);">Export Report (PDF)</button>
+                <input type="file" id="json-file-input" accept=".json" class="hidden">
             </div>
         </section>
+
+        <!-- Import Conflict Modal -->
+        <div id="import-modal" class="modal-overlay hidden">
+            <div class="modal-content glass card">
+                <h2 style="margin-bottom: 0.5rem;">Date Overlap Detected</h2>
+                <p id="modal-overlap-desc" style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;"></p>
+                <p style="font-size: 0.9rem; font-weight: 500;">How would you like to handle overlapping entries?</p>
+
+                <div class="modal-options">
+                    <button class="btn modal-option-btn" id="btn-merge-both" style="background: var(--accent-color); color: white;">
+                        <strong>Keep Both (Merge All)</strong>
+                        <div style="font-size: 0.8rem; opacity: 0.85; font-weight: normal;">Combine all entries from both JSON and this device.</div>
+                    </button>
+                    <button class="btn modal-option-btn" id="btn-merge-json" style="background: var(--warning); color: #000;">
+                        <strong>Use Imported JSON</strong>
+                        <div style="font-size: 0.8rem; opacity: 0.9; font-weight: normal;">Replace device entries with JSON entries for overlapping dates.</div>
+                    </button>
+                    <button class="btn modal-option-btn" id="btn-merge-local" style="background: rgba(255, 255, 255, 0.1); color: white;">
+                        <strong>Keep Device Data</strong>
+                        <div style="font-size: 0.8rem; opacity: 0.85; font-weight: normal;">Keep current device entries; only add non-overlapping dates from JSON.</div>
+                    </button>
+                </div>
+                <button id="btn-cancel-import" style="background: none; border: none; color: var(--text-secondary); margin-top: 1.2rem; width: 100%; cursor: pointer; text-align: center; font-size: 0.9rem;">Cancel Import</button>
+            </div>
+        </div>
 
         <div class="grid-2">
             <!-- Pie Chart for Sector Breakdown -->

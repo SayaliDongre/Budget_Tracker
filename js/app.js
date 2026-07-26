@@ -227,4 +227,21 @@ document.addEventListener('DOMContentLoaded', () => {
         Store.updateLastBackupTime();
         backupBanner.style.display = 'none';
     });
+
+    const btnBannerImport = document.getElementById('btn-banner-import');
+    Store.setupImportHandler({
+        triggerBtn: btnBannerImport,
+        fileInput: document.getElementById('json-file-input'),
+        modal: document.getElementById('import-modal'),
+        descEl: document.getElementById('modal-overlap-desc'),
+        btnBoth: document.getElementById('btn-merge-both'),
+        btnJson: document.getElementById('btn-merge-json'),
+        btnLocal: document.getElementById('btn-merge-local'),
+        btnCancel: document.getElementById('btn-cancel-import'),
+        onComplete: () => {
+            renderTags();
+            renderExpenses();
+            if (backupBanner) backupBanner.style.display = 'none';
+        }
+    });
 });
