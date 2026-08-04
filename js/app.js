@@ -282,6 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnBoth: document.getElementById('btn-merge-both'),
         btnJson: document.getElementById('btn-merge-json'),
         btnLocal: document.getElementById('btn-merge-local'),
+        btnReplaceAll: document.getElementById('btn-replace-all'),
         btnCancel: document.getElementById('btn-cancel-import'),
         onComplete: () => {
             renderTags();

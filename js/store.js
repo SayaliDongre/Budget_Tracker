@@ -290,7 +290,10 @@ class Store {
 
         let localExpenses = Store.getExpenses();
 
-        if (!overlapInfo || !overlapInfo.hasOverlap || strategy === 'keep-both') {
+        if (strategy === 'replace-all') {
+            // Complete clean replacement - wipe all local data, use only imported
+            localExpenses = [...normalizedImportedExpenses];
+        } else if (!overlapInfo || !overlapInfo.hasOverlap || strategy === 'keep-both') {
             const existingIds = new Set(localExpenses.map(e => e.id));
             normalizedImportedExpenses.forEach(exp => {
                 let uniqueExp = { ...exp };
@@ -331,9 +334,9 @@ class Store {
 
         // Merge Budgets
         if (importedData.budgets) {
-            const localBudgets = Store.getBudgets();
+            const localBudgets = strategy === 'replace-all' ? {} : Store.getBudgets();
             Object.keys(importedData.budgets).forEach(monthKey => {
-                if (!localBudgets[monthKey] || strategy === 'prefer-json') {
+                if (!localBudgets[monthKey] || strategy === 'prefer-json' || strategy === 'replace-all') {
                     localBudgets[monthKey] = importedData.budgets[monthKey];
                 } else if (strategy === 'keep-both') {
                     localBudgets[monthKey] = {
@@ -349,7 +352,7 @@ class Store {
     }
 
     static setupImportHandler(config) {
-        const { triggerBtn, fileInput, modal, descEl, btnBoth, btnJson, btnLocal, btnCancel, onComplete } = config;
+        const { triggerBtn, fileInput, modal, descEl, btnBoth, btnJson, btnLocal, btnReplaceAll, btnCancel, onComplete } = config;
         if (!fileInput) return;
 
         if (triggerBtn) {
@@ -369,16 +372,20 @@ class Store {
                     const importedData = JSON.parse(event.target.result);
                     const overlapInfo = Store.analyzeImportData(importedData);
 
-                    if (overlapInfo.hasOverlap && modal && descEl) {
-                        pendingImportData = importedData;
-                        pendingOverlapInfo = overlapInfo;
+                    pendingImportData = importedData;
+                    pendingOverlapInfo = overlapInfo;
 
-                        descEl.innerHTML = `Overlapping date range detected between <strong>${overlapInfo.overlapStart}</strong> and <strong>${overlapInfo.overlapEnd}</strong>.<br><br>Imported Range: ${overlapInfo.minImported} to ${overlapInfo.maxImported}<br>Device Range: ${overlapInfo.minLocal} to ${overlapInfo.maxLocal}`;
+                    // Always show modal so user can choose strategy
+                    if (modal && descEl) {
+                        const importedCount = (importedData.expenses || []).length;
+                        const localCount = Store.getExpenses().length;
+
+                        if (overlapInfo.hasOverlap) {
+                            descEl.innerHTML = `<strong>Overlap detected:</strong> ${overlapInfo.overlapStart} to ${overlapInfo.overlapEnd}<br><br>JSON file: ${importedCount} expenses (${overlapInfo.minImported} to ${overlapInfo.maxImported})<br>This device: ${localCount} expenses (${overlapInfo.minLocal} to ${overlapInfo.maxLocal})`;
+                        } else {
+                            descEl.innerHTML = `<strong>No date overlap found.</strong><br><br>JSON file: ${importedCount} expenses<br>This device: ${localCount} expenses<br><br>Choose how to import:`;
+                        }
                         modal.classList.remove('hidden');
-                    } else {
-                        Store.mergeImportData(importedData, 'keep-both', overlapInfo);
-                        alert("Data imported and merged successfully!");
-                        if (onComplete) onComplete();
                     }
                 } catch (err) {
                     alert("Failed to import file: " + err.message);
@@ -390,11 +397,16 @@ class Store {
 
         const executeMerge = (strategy) => {
             if (pendingImportData) {
+                if (strategy === 'replace-all') {
+                    if (!confirm("This will DELETE all current device data and replace it entirely with the JSON file. Are you sure?")) {
+                        return;
+                    }
+                }
                 Store.mergeImportData(pendingImportData, strategy, pendingOverlapInfo);
                 if (modal) modal.classList.add('hidden');
                 pendingImportData = null;
                 pendingOverlapInfo = null;
-                alert("Data imported and merged successfully!");
+                alert("Data imported successfully!");
                 if (onComplete) onComplete();
             }
         };
@@ -402,6 +414,7 @@ class Store {
         if (btnBoth) btnBoth.onclick = () => executeMerge('keep-both');
         if (btnJson) btnJson.onclick = () => executeMerge('prefer-json');
         if (btnLocal) btnLocal.onclick = () => executeMerge('prefer-local');
+        if (btnReplaceAll) btnReplaceAll.onclick = () => executeMerge('replace-all');
         if (btnCancel && modal) {
             btnCancel.onclick = () => {
                 modal.classList.add('hidden');

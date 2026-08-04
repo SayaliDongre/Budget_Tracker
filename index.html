@@ -94,18 +94,22 @@
         <!-- Import Conflict Modal -->
         <div id="import-modal" class="modal-overlay hidden">
             <div class="modal-content glass card">
-                <h2 style="margin-bottom: 0.5rem;">Date Overlap Detected</h2>
+                <h2 style="margin-bottom: 0.5rem;">Import Options</h2>
                 <p id="modal-overlap-desc" style="color: var(--text-secondary); margin-bottom: 1rem; font-size: 0.95rem;"></p>
-                <p style="font-size: 0.9rem; font-weight: 500;">How would you like to handle overlapping entries?</p>
+                <p style="font-size: 0.9rem; font-weight: 500;">How would you like to import this data?</p>
 
                 <div class="modal-options">
+                    <button class="btn modal-option-btn" id="btn-replace-all" style="background: var(--danger); color: white;">
+                        <strong>🔄 Replace All (Clean Import)</strong>
+                        <div style="font-size: 0.8rem; opacity: 0.85; font-weight: normal;">Wipe all current device data. Use ONLY the JSON file. Best for fixing corrupted imports.</div>
+                    </button>
                     <button class="btn modal-option-btn" id="btn-merge-both" style="background: var(--accent-color); color: white;">
                         <strong>Keep Both (Merge All)</strong>
                         <div style="font-size: 0.8rem; opacity: 0.85; font-weight: normal;">Combine all entries from both JSON and this device.</div>
                     </button>
                     <button class="btn modal-option-btn" id="btn-merge-json" style="background: var(--warning); color: #000;">
                         <strong>Use Imported JSON</strong>
-                        <div style="font-size: 0.8rem; opacity: 0.9; font-weight: normal;">Replace device entries with JSON entries for overlapping dates.</div>
+                        <div style="font-size: 0.8rem; opacity: 0.9; font-weight: normal;">Replace device entries with JSON entries for overlapping dates only.</div>
                     </button>
                     <button class="btn modal-option-btn" id="btn-merge-local" style="background: rgba(255, 255, 255, 0.1); color: white;">
                         <strong>Keep Device Data</strong>
