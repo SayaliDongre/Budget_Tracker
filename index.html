@@ -34,7 +34,11 @@
                 <h2>Add Expense</h2>
                 <div class="form-group">
                     <label for="date-selector">Select Date</label>
-                    <input type="date" id="date-selector">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <button id="btn-prev-date" class="btn-icon" style="font-size: 1.4rem; padding: 0.5rem;" title="Previous Day">◀</button>
+                        <input type="date" id="date-selector" style="flex: 1;">
+                        <button id="btn-next-date" class="btn-icon" style="font-size: 1.4rem; padding: 0.5rem;" title="Next Day">▶</button>
+                    </div>
                 </div>
 
                 <div class="form-group">

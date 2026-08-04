@@ -24,6 +24,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const today = new Date().toISOString().split('T')[0];
     dateSelector.value = today;
 
+    // Date arrow navigation
+    const btnPrevDate = document.getElementById('btn-prev-date');
+    const btnNextDate = document.getElementById('btn-next-date');
+
+    function shiftDate(days) {
+        const current = new Date(dateSelector.value + 'T00:00:00');
+        current.setDate(current.getDate() + days);
+        dateSelector.value = current.toISOString().split('T')[0];
+        renderExpenses();
+    }
+
+    btnPrevDate.addEventListener('click', () => shiftDate(-1));
+    btnNextDate.addEventListener('click', () => shiftDate(1));
+
     function renderTags() {
         tagsContainer.innerHTML = '';
         const tags = Store.getTags();
@@ -215,9 +229,15 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        // Resolve tag name and icon for self-contained storage
+        const tags = Store.getTags();
+        const selectedTag = tags.find(t => t.id === selectedTagId) || { name: 'Unknown', icon: '❓' };
+
         if (editingExpenseId) {
             Store.updateExpense(editingExpenseId, {
                 tagId: selectedTagId,
+                tagName: selectedTag.name,
+                tagIcon: selectedTag.icon,
                 desc: desc,
                 amount: parseFloat(amount),
                 date: date
@@ -226,6 +246,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             Store.saveExpense({
                 tagId: selectedTagId,
+                tagName: selectedTag.name,
+                tagIcon: selectedTag.icon,
                 desc: desc,
                 amount: parseFloat(amount),
                 date: date
