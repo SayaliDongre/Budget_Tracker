@@ -20,8 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let selectedTagId = null;
 
-    // Set default date to today
-    const today = new Date().toISOString().split('T')[0];
+    // Set default date to today (local time, not UTC)
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     dateSelector.value = today;
 
     // Date arrow navigation
@@ -29,7 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnNextDate = document.getElementById('btn-next-date');
 
     function shiftDate(days) {
-        const current = new Date(dateSelector.value + 'T00:00:00');
+        const parts = dateSelector.value.split('-');
+        const current = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
         current.setDate(current.getDate() + days);
         const y = current.getFullYear();
         const m = String(current.getMonth() + 1).padStart(2, '0');
@@ -38,8 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderExpenses();
     }
 
-    btnPrevDate.addEventListener('click', () => shiftDate(-1));
-    btnNextDate.addEventListener('click', () => shiftDate(1));
+    btnPrevDate.addEventListener('click', (e) => { e.preventDefault(); shiftDate(-1); });
+    btnNextDate.addEventListener('click', (e) => { e.preventDefault(); shiftDate(1); });
 
     function renderTags() {
         tagsContainer.innerHTML = '';
