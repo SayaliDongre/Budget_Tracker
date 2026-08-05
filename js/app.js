@@ -31,7 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
     function shiftDate(days) {
         const current = new Date(dateSelector.value + 'T00:00:00');
         current.setDate(current.getDate() + days);
-        dateSelector.value = current.toISOString().split('T')[0];
+        const y = current.getFullYear();
+        const m = String(current.getMonth() + 1).padStart(2, '0');
+        const d = String(current.getDate()).padStart(2, '0');
+        dateSelector.value = `${y}-${m}-${d}`;
         renderExpenses();
     }
 
